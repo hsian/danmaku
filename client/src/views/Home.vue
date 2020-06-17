@@ -2,16 +2,18 @@
 	<div>
 		<div class="container">
 			<h3>直播间列表</h3>
-			<ul class="room-list">
+			<ul class="room-list">	
 				<li
 				v-for="(item, index) in clients"
-				:key="index"
-				@click="handleChangeRoom(item)" >
-					<div>房间ID：{{item.id}}</div>
-					<div>在线时长：{{item.alive}}秒</div>	
-					<div>房间名：{{item.url.split("\/")[1]}}</div>	
-					<button>进入直播间</button>
+				:key="index">
+					<router-link target="_blank" :to="`/${item.url.split('\/')[1]}`">
+						<div>房间ID：{{item.id}}</div>
+						<div>在线时长：{{item.alive}}秒</div>	
+						<div>房间名：{{item.url.split("\/")[1]}}</div>	
+						<button>进入直播间</button>
+					</router-link>
 				</li>
+			
 			</ul>
 		</div>
 	</div>
@@ -39,9 +41,9 @@
 			})
 		},
 		methods: {
-			handleChangeRoom(item){
-				window.open(`/${item.url.split("\/")[1]}`, "_blank");
-			},
+			// handleChangeRoom(item){
+			// 	window.open(`/${item.url.split("\/")[1]}`, "_blank");
+			// },
 		}
 	}
 </script>
@@ -61,6 +63,10 @@
 			padding: 10px;
 			cursor: pointer;
 			text-align: left;
+
+			a{
+				color: inherit
+			}
 
 			button{
 				margin: 10px auto;
