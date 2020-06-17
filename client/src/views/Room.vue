@@ -256,7 +256,7 @@
 	}
 
 	.dplayer-video-wrap .dplayer-video{
-		height: 365px;
+		height: 365px!important;
 	}
 
 	.messages{
