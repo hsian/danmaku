@@ -4,12 +4,12 @@
 			<h3>直播间列表</h3>
 			<ul class="room-list">	
 				<li
-				v-for="(item, index) in clients"
+				v-for="(item, index) in streams"
 				:key="index">
-					<router-link target="_blank" :to="`/${item.url.split('\/')[1]}`">
+					<router-link target="_blank" :to="`/${item.app}`">
 						<div>房间ID：{{item.id}}</div>
-						<div>在线时长：{{item.alive}}秒</div>	
-						<div>房间名：{{item.url.split("\/")[1]}}</div>	
+						<div>观看人数：{{item.clients}}</div>	
+						<div>房间名：{{item.app}}</div>	
 						<button>进入直播间</button>
 					</router-link>
 				</li>
@@ -26,17 +26,17 @@
 	export default {
 		data(){
 			return {
-				clients: []
+				streams: []
 			}
 		},
 		mounted(){
-			fetch(liveURL + ":1985/api/v1/clients/")
+			fetch(liveURL + ":1985/api/v1/streams/")
 			.then(res => {
 				return res.json()
 			}).then(res => {
-				const {code, clients} = res;
+				const {code, streams} = res;
 				if(code === 0){
-					this.clients = clients;
+					this.streams = streams;
 				}
 			})
 		},
@@ -65,7 +65,8 @@
 			text-align: left;
 
 			a{
-				color: inherit
+				color: inherit;
+				text-decoration: none;
 			}
 
 			button{

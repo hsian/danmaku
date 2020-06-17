@@ -171,6 +171,11 @@
 				this.danmakaType = 1;
 				this.socket.emit("sendMessage", value, () => {
 					document.querySelector(".dplayer-comment-input").value = "";
+
+					// 滚动到底部
+					var $message = document.querySelector(".messages");
+					var liHeight = $message.querySelector("li").offsetHeight;
+					$message.scrollTo(0,  liHeight * (this.messages.length + 1));
 				})
 			},
 
@@ -178,7 +183,7 @@
 
 				this.danmakaType = 0;
 
-				if(this.inputValue){
+				if(this.inputValue.trim()){
 					this.dp.danmaku.send(
 					    {
 					        text: this.inputValue,
@@ -189,6 +194,8 @@
 					        // console.log('success');
 					    }
 					);
+
+					this.inputValue = "";
 				}
 
 				// this.socket.emit("sendMessage", this.inputValue, () => {
