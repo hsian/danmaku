@@ -157,8 +157,6 @@
 						return;
 					}
 
-					console.log(123123123)
-
 					const danmaku = {
 					    text: data.text,
 					    color: '#00db33',
@@ -180,8 +178,6 @@
 
 				this.danmakaType = 0;
 
-				console.log(this.inputValue)
-
 				if(this.inputValue){
 					this.dp.danmaku.send(
 					    {
@@ -190,7 +186,7 @@
 					        type: 'right', // should be `top` `bottom` or `right`
 					    },
 					    function () {
-					        console.log('success');
+					        // console.log('success');
 					    }
 					);
 				}
