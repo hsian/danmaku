@@ -2,6 +2,7 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const cors = require('cors');
+const path = require('path')
 
 const router = require('./router');
 
@@ -13,13 +14,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(router);
+app.use(express.static(path.resolve("../", "client/dist")))
 
 // redis做缓存
 var rooms = {
-	10000: {
-		users: [],
-		status: true
-	}
+	// 10000: {
+	// 	users: [],
+	// 	status: true
+	// }
 };
 var socketIdMaps = {};
 
@@ -33,7 +35,7 @@ io.on('connect', (socket) => {
 		const mockUser = {
 			statusCode: 200,
 			data: {
-				username: "tony" + Math.random().toFixed(4),
+				username: token, // it shoud be token exchange from api to get the username
 				age: 18,
 				avatar: "",
 				gender: 1
@@ -51,6 +53,17 @@ io.on('connect', (socket) => {
 			}
 		}
 
+		let UserExist = false;
+		rooms[room].users.forEach(v => {
+			if(v.username === token){
+				UserExist = true;
+			}
+		})
+		if(UserExist){
+			return callback({code: 1, message: "用户名已存在"})
+		}
+		
+
 		rooms[room].users.push({
 			...mockUser.data,
 			id: socket.id
@@ -66,7 +79,7 @@ io.on('connect', (socket) => {
 
 		socket.emit('message', {
 			user: mockUser,
-			text: `欢迎${mockUser.data.username}`
+			text: `欢迎 ${mockUser.data.username}`
 		});
 
 		socket.broadcast.to(room).emit('message', {
@@ -89,19 +102,29 @@ io.on('connect', (socket) => {
 	})
 
 	socket.on('disconnect', () => {
-		const room = socketIdMaps[socket.id];
 
-		delete socketIdMaps[socket.id];
+		try{
+			const room = socketIdMaps[socket.id];
 
-		const index = rooms[room].users.findIndex(v => v.id === socket.id);
-		const user = rooms[room].users[index];
-		rooms[room].users.slice(index, 1);
+			delete socketIdMaps[socket.id];
 
-		if(!user) return;
+			// 不知道干嘛一直报错
+			if(!rooms[room]) return;
 
-		io.to(room).emit('message', {
-			text: `通知：${user.username}离开了直播间`
-		})
+			const index = rooms[room].users.findIndex(function(v){
+				return v.id === socket.id;
+			});
+			const user = rooms[room].users[index];
+			rooms[room].users.splice(index, 1);
+
+			if(!user) return;
+
+			io.to(room).emit('message', {
+				text: `通知：${user.username}离开了直播间`
+			})
+		}catch(err){
+			console.log(err)
+		}
 	})
 });
 

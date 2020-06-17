@@ -1,33 +1,55 @@
 <template>
 	<div>
-		<div>
-			直播间列表
+		<div class="container">
+			<h3>直播间列表</h3>
 			<ul class="room-list">
-				<li @click="handleChangeRoom(item)" 
-				v-for="(item, index) in ['10000', '10001', '10002', '10003']"
-				:key="index">{{item}}</li>
+				<li
+				v-for="(item, index) in clients"
+				:key="index"
+				@click="handleChangeRoom(item)" >
+					<div>房间ID：{{item.id}}</div>
+					<div>在线时长：{{item.alive}}秒</div>	
+					<div>房间名：{{item.url.split("\/")[1]}}</div>	
+					<button>进入直播间</button>
+				</li>
 			</ul>
 		</div>
 	</div>
 </template>
 
 <script>
+	import {pluginOptions} from "../../vue.config.js"
+	const liveURL = pluginOptions.liveURL;
+
 	export default {
 		data(){
 			return {
+				clients: []
 			}
 		},
 		mounted(){
-
+			fetch(liveURL + ":1985/api/v1/clients/")
+			.then(res => {
+				return res.json()
+			}).then(res => {
+				const {code, clients} = res;
+				if(code === 0){
+					this.clients = clients;
+				}
+			})
 		},
 		methods: {
-			handleChangeRoom(room){
-				window.open(`/${room}`, "_blank");
+			handleChangeRoom(item){
+				window.open(`/${item.url.split("\/")[1]}`, "_blank");
 			},
 		}
 	}
 </script>
 <style scpoed lang="less">
+	.container{
+		max-width: 900px;
+		margin: 20px auto;
+	}
 	.room-list{
 		margin: 20px 0;
 		list-style: none;
@@ -36,8 +58,14 @@
 		li{
 			margin: 10px;
 			border: 1px #eee solid;
-			padding: 5px;
+			padding: 10px;
 			cursor: pointer;
+			text-align: left;
+
+			button{
+				margin: 10px auto;
+				display: block;
+			}
 		}
 	}
 </style>
